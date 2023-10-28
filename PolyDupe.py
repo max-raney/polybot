@@ -9,7 +9,7 @@ TILE_WATER = 'water'
 class Map:
     def __init__(self, size):
         # Initialize the map as a 2D array of tile types
-        self.map = np.empty((size, size), dtype=str)
+        self.map = np.empty((size, size), dtype=Tile)
         self.size = size
         self.troop = None
 
@@ -18,7 +18,7 @@ class Map:
                 # Initialize each tile as empty
                 self.map[x][y] = TILE_EMPTY
 
-    def draw(self, screen, tile_image, screen_dims):
+    def draw(self, screen, tile_image, screen_dims, map_coords):
         # Define the size of each tile (image size)
         tile_size = np.array([tile_image.get_width(), tile_image.get_height()]) // 10
 
@@ -26,7 +26,7 @@ class Map:
             for y in range(self.size):
                 # Calculate the position of the tile on the screen
                 # Adjust the x and y coordinates based on the map's shape
-                tile_coords = self.index_to_pixel(x, y, screen_dims, tile_size)
+                tile_coords = self.index_to_pixel(x, y, tile_size, screen_dims, map_coords)
 
                 # Get the type of the current tile
                 tile_type = self.map[x][y]
@@ -37,12 +37,11 @@ class Map:
                 # Draw the scaled tile image at the calculated position
                 screen.blit(scaled_tile, tile_coords.T[0])
     
-    def index_to_pixel(self, x, y, screen_dims, tile_size, offset = 1):
+    def index_to_pixel(self, x, y, tile_size, screen_dims,  offset = [5,5]):
         A = np.array([[0.4975, 0.4975],[-0.31, 0.31]])
         coordinate = np.array([[x], [y]])
-        offset_v = np.array([[offset], [offset + screen_dims[1]/2]])
+        offset_v = np.array([[offset[0]], [offset[1] + screen_dims[1]/2]])
         resize_matrix = np.diag(tile_size)
-        transformation_matrix = resize_matrix @ A
 
         return np.floor(resize_matrix @ (A @ coordinate) + offset_v).astype(int)
 
@@ -89,12 +88,35 @@ def main():
     # Create a map with a size of 10x10 (adjust the size as needed)
     game_map = Map(10)
 
+    # Initial position of the map
+    map_x, map_y = 0, 0
+
+    # Initial variables for click-and-drag
+    dragging = False
+    start_x, start_y = 0, 0
+    scroll_speed = 1
+
     # Main game loop
     running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:  # Left mouse button
+                    dragging = True
+                    start_x, start_y = event.pos
+            if event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:
+                    dragging = False
+            if event.type == pygame.MOUSEMOTION:
+                if dragging:
+                    x, y = event.pos
+                    # Calculate the difference in mouse position and move the map accordingly
+                    map_x += (x - start_x) * scroll_speed
+                    map_y += (y - start_y) * scroll_speed
+                    start_x, start_y = x, y
+
 
         # Your game logic goes here
 
@@ -102,7 +124,7 @@ def main():
         screen.fill((255, 255, 255))
 
         # Draw the map
-        game_map.draw(screen, tile_image, (screen_width, screen_height))
+        game_map.draw(screen, tile_image, (screen_width, screen_height), (map_x, map_y))
 
         # Update the display
         pygame.display.flip()
