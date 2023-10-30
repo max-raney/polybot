@@ -18,33 +18,22 @@ class Map:
                 # Initialize each tile as empty
                 self.map[x][y] = TILE_EMPTY
 
-    def draw(self, screen, tile_image, screen_dims, map_coords):
-        # Define the size of each tile (image size)
-        tile_size = np.array([tile_image.get_width(), tile_image.get_height()]) // 10
+    def draw(self, dimensions):#screen, tile_image, screen_dims, map_coords):
 
         for x in range(self.size-1, -1, -1):
             for y in range(self.size):
                 # Calculate the position of the tile on the screen
                 # Adjust the x and y coordinates based on the map's shape
-                tile_coords = self.index_to_pixel(x, y, tile_size, screen_dims, map_coords)
+                tile_coords = index_to_pixel(x, y, dimensions)
 
                 # Get the type of the current tile
                 tile_type = self.map[x][y]
 
                 # Scale down the tile image
-                scaled_tile = pygame.transform.scale(tile_image, tile_size.astype(int))
+                scaled_tile = pygame.transform.scale(pygame.image.load("Art/Terrain/Tiles/ground_1.png"), dimensions['tile_size'].astype(int))
 
                 # Draw the scaled tile image at the calculated position
-                screen.blit(scaled_tile, tile_coords.T[0])
-    
-    def index_to_pixel(self, x, y, tile_size, screen_dims,  offset = [5,5]):
-        A = np.array([[0.4975, 0.4975],[-0.31, 0.31]])
-        coordinate = np.array([[x], [y]])
-        offset_v = np.array([[offset[0]], [offset[1] + screen_dims[1]/2]])
-        resize_matrix = np.diag(tile_size)
-
-        return np.floor(resize_matrix @ (A @ coordinate) + offset_v).astype(int)
-
+                dimensions['screen'].blit(scaled_tile, tile_coords.T[0])
 
 class Tile():
     def __init__(self, land_type):
@@ -54,9 +43,14 @@ class City():
     ''
 
 class Troop():
+    troop_image = 'Art/Units/Imperius/Default/Imperius_Default_Scout.png'
+    
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
+    def draw(self, dimensions):
+        coords = index_to_pixel(self.x, self.y, dimensions)
 
 class Warrior(Troop):
     attack = 2
@@ -68,16 +62,33 @@ class Warrior(Troop):
         self.health = 10
         super(x, y)
 
+def tile_size(tile_image):
+    return np.array([tile_image.get_width(), tile_image.get_height()]) // 10
+
+def index_to_pixel(x, y, dimensions):
+    A = np.array([[0.4975, 0.4975],[-0.31, 0.31]])
+    coordinate = np.array([[x], [y]])
+    offset_v = np.array([[dimensions['camera_offset'][0]], [dimensions['camera_offset'][1] + dimensions['screen_dims'][1]/2]])
+    resize_matrix = np.diag(dimensions['tile_size'])
+
+    return np.floor(resize_matrix @ (A @ coordinate) + offset_v).astype(int)
+
 def main():
     # Initialize Pygame
     pygame.init()
+
+    dimensions = {
+        'screen_dims': [1600, 900],
+        'tile_size': tile_size(pygame.image.load("Art/Terrain/Tiles/ground_1.png")),
+        'camera_offset': [0, 0]
+    }
 
     # Define screen dimensions
     screen_width = 1600
     screen_height = 900
 
     # Create a Pygame window
-    screen = pygame.display.set_mode((screen_width, screen_height))
+    dimensions['screen'] = pygame.display.set_mode((screen_width, screen_height))
 
     # Set the window title
     pygame.display.set_caption("Fake Poly")
@@ -87,9 +98,6 @@ def main():
 
     # Create a map with a size of 10x10 (adjust the size as needed)
     game_map = Map(10)
-
-    # Initial position of the map
-    map_x, map_y = 0, 0
 
     # Initial variables for click-and-drag
     dragging = False
@@ -113,18 +121,18 @@ def main():
                 if dragging:
                     x, y = event.pos
                     # Calculate the difference in mouse position and move the map accordingly
-                    map_x += (x - start_x) * scroll_speed
-                    map_y += (y - start_y) * scroll_speed
+                    dimensions['camera_offset'][0] += (x - start_x) * scroll_speed
+                    dimensions['camera_offset'][0] += (y - start_y) * scroll_speed
                     start_x, start_y = x, y
 
 
         # Your game logic goes here
 
         # Clear the screen (fill with background color)
-        screen.fill((255, 255, 255))
+        dimensions['screen'].fill((0, 0, 0))
 
         # Draw the map
-        game_map.draw(screen, tile_image, (screen_width, screen_height), (map_x, map_y))
+        game_map.draw(dimensions)
 
         # Update the display
         pygame.display.flip()
