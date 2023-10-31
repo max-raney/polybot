@@ -20,20 +20,21 @@ class Map:
 
     def draw(self, dimensions):#screen, tile_image, screen_dims, map_coords):
 
+        map_surface = pygame.Surface(dimensions['screen'].get_size())
+        scaled_tile = pygame.transform.scale(pygame.image.load("Art/Terrain/Tiles/ground_1.png"), dimensions['tile_size'].astype(int))
+
         for x in range(self.size-1, -1, -1):
             for y in range(self.size):
                 # Calculate the position of the tile on the screen
-                # Adjust the x and y coordinates based on the map's shape
                 tile_coords = index_to_pixel(x, y, dimensions)
 
                 # Get the type of the current tile
                 tile_type = self.map[x][y]
 
-                # Scale down the tile image
-                scaled_tile = pygame.transform.scale(pygame.image.load("Art/Terrain/Tiles/ground_1.png"), dimensions['tile_size'].astype(int))
-
                 # Draw the scaled tile image at the calculated position
-                dimensions['screen'].blit(scaled_tile, tile_coords.T[0])
+                map_surface.blit(scaled_tile, tile_coords.T[0])
+        
+        dimensions['screen'].blit(map_surface, (0, 0))
 
 class Tile():
     def __init__(self, land_type):
@@ -122,7 +123,7 @@ def main():
                     x, y = event.pos
                     # Calculate the difference in mouse position and move the map accordingly
                     dimensions['camera_offset'][0] += (x - start_x) * scroll_speed
-                    dimensions['camera_offset'][0] += (y - start_y) * scroll_speed
+                    dimensions['camera_offset'][1] += (y - start_y) * scroll_speed
                     start_x, start_y = x, y
 
 
