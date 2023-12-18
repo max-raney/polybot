@@ -3,12 +3,11 @@ import pygame
 import numpy as np
 
 class Map:
-    def __init__(self, size, drawer):
+    def __init__(self, size):
         # Initialize the map as a 2D array of tile types
         self.tiles = np.empty((size, size), dtype=Tile)
         self.size = size
-        self.troop = None
-        self.drawer = drawer
+        self.units = []
 
         for x in range(size):
             for y in range(size):
@@ -18,8 +17,9 @@ class Map:
                 else:
                     self.tiles[x][y] = Tile('water')
 
-    def draw(self):
-        self.drawer.draw_map(self)
+    def add_unit(self, unit, x, y):
+        self.tiles[x][y].troop = unit
+        self.units.append(unit)
 
 class Tile:
     def __init__(self, land_type):
@@ -36,13 +36,10 @@ class City:
 class Unit:
     unit_image = pygame.image.load('Art/Units/Imperius/Default/Imperius_Default_Scout.png')
     
-    def __init__(self, x, y, drawer):
+    def __init__(self, x, y, map):
         self.x = x
         self.y = y
-        self.drawer = drawer
-
-    def draw(self):
-        self.drawer.draw_unit(self)
+        map.add_unit(self, x, y)
 
 class Warrior(Unit):
     attack = 2
@@ -52,9 +49,9 @@ class Warrior(Unit):
 
     unit_image = pygame.image.load('Art/Units/Imperius/Default/Imperius_Default_Warrior.png')
     
-    def __init__(self, x, y, drawer):
+    def __init__(self, x, y, map):
         self.health = 10
-        super().__init__(x, y, drawer)
+        super().__init__(x, y, map)
 
 
 def scaled_size(image, dimensions):
