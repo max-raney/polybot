@@ -5,25 +5,10 @@ from PolyEntities import Map, Warrior
 from PolyDraw import Drawer
 
 
-def scaled_size(image, dimensions):
-    return np.array([image.get_width(), image.get_height()]) // dimensions['scale']
-
-
 def main():
     # Initialize Pygame
     pygame.init()
-
-    dimensions = {
-        'screen_dims': [1600, 900],
-        'camera_offset': [0, 0],
-        'scale': 10
-    }
-
-    # Create a Pygame window
-    dimensions['screen'] = pygame.display.set_mode(dimensions['screen_dims'])
-    dimensions['tile_size'] = scaled_size(pygame.image.load("Art/Terrain/Tiles/ground_1.png"), dimensions)
-    dimensions['unit_size'] = scaled_size(pygame.image.load('Art/Units/Imperius/Default/Imperius_Default_Warrior.png'),
-                                          dimensions) * 3
+    camera_offset = [0, 0]
 
     # Set the window title
     pygame.display.set_caption("Fake Poly")
@@ -32,7 +17,7 @@ def main():
     game_map = Map(20)
 
     # Create a Drawer instance
-    drawer = Drawer(dimensions, game_map)
+    drawer = Drawer(game_map)
 
     # Initialize two warriors
     warrior_1 = Warrior(0, 0, game_map)
@@ -60,15 +45,12 @@ def main():
                 if dragging:
                     x, y = event.pos
                     # Calculate the difference in mouse position and move the map accordingly
-                    dimensions['camera_offset'][0] += (x - start_x) * scroll_speed
-                    dimensions['camera_offset'][1] += (y - start_y) * scroll_speed
+                    camera_offset[0] += (x - start_x) * scroll_speed
+                    camera_offset[1] += (y - start_y) * scroll_speed
                     start_x, start_y = x, y
 
-        # Clear the screen (fill with background color)
-        dimensions['screen'].fill((0, 0, 0))
-
         # Update the display
-        drawer.draw_frame()
+        drawer.draw_frame(camera_offset)
 
     # Quit Pygame
     pygame.quit()
