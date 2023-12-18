@@ -41,11 +41,14 @@ class City:
 
 
 class Unit:
-    unit_image = pygame.image.load('Art/Units/Imperius/Default/Imperius_Default_Scout.png')
+    class UnitType(Enum):
+        SCOUT = 'scout'
+        WARRIOR = 'warrior'
 
     def __init__(self, x, y, map):
         self.x = x
         self.y = y
+        self.unit_type = Unit.UnitType.SCOUT
         map.add_unit(self, x, y)
 
 
@@ -55,8 +58,7 @@ class Warrior(Unit):
     movement = 1
     range = 1
 
-    unit_image = pygame.image.load('Art/Units/Imperius/Default/Imperius_Default_Warrior.png')
-
     def __init__(self, x, y, map):
         self.health = 10
         super().__init__(x, y, map)
+        self.unit_type = Unit.UnitType.WARRIOR
