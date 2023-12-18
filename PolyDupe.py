@@ -27,6 +27,7 @@ def main():
     dragging = False
     start_x, start_y = 0, 0
     scroll_speed = 1
+    rescale_value = 0.1
 
     # Main game loop
     running = True
@@ -49,9 +50,11 @@ def main():
                     camera_offset[0] += (x - start_x) * scroll_speed
                     camera_offset[1] += (y - start_y) * scroll_speed
                     start_x, start_y = x, y
+            if event.type == pygame.MOUSEWHEEL:
+                rescale_value *= 1.1 ** event.y
 
         # Update the display
-        drawer.draw_frame(camera_offset)
+        drawer.draw_frame(camera_offset, rescale_value)
 
     # Quit Pygame
     pygame.quit()
