@@ -1,4 +1,5 @@
 # PolyDraw.py
+# UI
 import pygame
 import numpy as np
 from PolyEntities import Map, Tile, Unit
@@ -26,14 +27,17 @@ class Drawer:
         self._resize_images(0.1)
         self.camera_offset = [0, 0]
 
-    def _calculate_tile_coords(self, x, y, offset=[0, 0]):
-        A = np.array([[0.4975, 0.4975], [-0.31, 0.31]])
-        coordinate = np.array([[x], [y]])
-        offset_v = np.array([[self.camera_offset[0] + offset[0]],
-                             [self.camera_offset[1] + offset[1] + self.SCREEN_DIMENSIONS[1] / 2]])
-        resize_matrix = np.diag(self.TILE_DIMENSIONS) * self.scale
+    def _tile_coordinates(self, coordinate, offset=(0, 0)):
+        # translates coordinates into pixel values
+        translation_matrix = np.array([[507, 507], [-302.56, 302.56]]) * self.scale
+        # offset from (0,0)
+        offset_vector = np.array([[self.camera_offset[0] + offset[0]],
+                                  [self.camera_offset[1] + offset[1] + self.SCREEN_DIMENSIONS[1] / 2]])
+        # switch to column vector for multiplication
+        coordinate = np.array([[coordinate[0]], [coordinate[1]]])
 
-        return np.floor(resize_matrix @ (A @ coordinate) + offset_v).astype(int)
+        # coordinates @ translation + offset is the pixel location
+        return np.floor(translation_matrix @ coordinate + offset_vector).astype(int)
 
     def _resize_images(self, scale):
         for land_type, image in self.REFERENCE_IMAGES.items():
@@ -45,7 +49,7 @@ class Drawer:
 
         for x in range(self.game_map.size - 1, -1, -1):
             for y in range(self.game_map.size):
-                tile_coords = self._calculate_tile_coords(x, y)
+                tile_coords = self._tile_coordinates((x, y))
                 image = self.images[self.game_map.tiles[x][y].land_type]
                 map_surface.blit(image, tile_coords.T[0])
 
@@ -54,7 +58,7 @@ class Drawer:
     # Draws all units
     def _draw_units(self):
         for unit in self.game_map.units:
-            coords = self._calculate_tile_coords(unit.x, unit.y, [8, -30])
+            coords = self._tile_coordinates((unit.x, unit.y), [8, -30])
             image = self.images[unit.unit_type]
             self.screen.blit(image, coords.T[0])
 
@@ -64,3 +68,21 @@ class Drawer:
         self._draw_map()
         self._draw_units()
         pygame.display.flip()
+
+    # returns the X and Y tile coordinates based on the pixel coordinates (reverse of _tile_coordinates)
+    def tile_clicked(self, pixel_coordinates):
+
+        # translates coordinates into pixel values
+        inverse_translation_matrix = np.array([[0.000986, -0.00165], [0.000986, 0.00165]]) / self.scale
+        # offset from (0,0)
+        offset_vector = np.array([[self.camera_offset[0]],
+                                  [self.camera_offset[1] + self.SCREEN_DIMENSIONS[1] / 2]])
+        # switch to column vector for multiplication
+        pixel_vector = np.array([[pixel_coordinates[0]], [pixel_coordinates[1]]])
+
+        # subtract offset, tile value to center, and reverse transformation is the coordinate
+        tile_coordinate = np.round(inverse_translation_matrix @ (pixel_vector - offset_vector)).astype(int) - np.array(
+            [[0], [1]])
+
+        print(f"Player selected tile {tile_coordinate}")
+        return tile_coordinate

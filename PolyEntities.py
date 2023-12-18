@@ -45,11 +45,11 @@ class Unit:
         SCOUT = 'scout'
         WARRIOR = 'warrior'
 
-    def __init__(self, x, y, map):
+    def __init__(self, x, y, game_map):
         self.x = x
         self.y = y
         self.unit_type = Unit.UnitType.SCOUT
-        map.add_unit(self, x, y)
+        game_map.add_unit(self, x, y)
 
 
 class Warrior(Unit):
@@ -58,7 +58,7 @@ class Warrior(Unit):
     movement = 1
     range = 1
 
-    def __init__(self, x, y, map):
+    def __init__(self, x, y, game_map):
         self.health = 10
-        super().__init__(x, y, map)
+        super().__init__(x, y, game_map)
         self.unit_type = Unit.UnitType.WARRIOR

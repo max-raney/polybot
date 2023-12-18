@@ -13,8 +13,8 @@ def main():
     # Set the window title
     pygame.display.set_caption("Fake Poly")
 
-    # Create a map with a size of 10x10 (adjust the size as needed)
-    game_map = Map(20)
+    # Create a map
+    game_map = Map(40)
 
     # Create a Drawer instance
     drawer = Drawer(game_map)
@@ -38,6 +38,7 @@ def main():
                 if event.button == 1:  # Left mouse button
                     dragging = True
                     start_x, start_y = event.pos
+                    drawer.tile_clicked(event.pos)
             if event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     dragging = False
