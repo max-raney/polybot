@@ -15,10 +15,11 @@ class Map:
         for x in range(size):
             for y in range(size):
                 if (x + y) % 2 == 0:
-                    self.tiles[x][y] = Tile(Tile.LandType.GRASS)
+                    self.tiles[x][y] = Tile(Tile.LandType.PLAINS)
+                elif x % 3 == 0:
+                    self.tiles[x][y] = Tile(Tile.LandType.MOUNTAINS)
                 else:
-                    self.tiles[x][y] = Tile(Tile.LandType.WATER)
-
+                    self.tiles[x][y] = Tile(Tile.LandType.OCEAN)
     def add_unit(self, unit, x, y):
         self.tiles[x][y].troop = unit
         self.units.append(unit)
@@ -26,13 +27,26 @@ class Map:
 
 class Tile:
     class LandType(Enum):
-        GRASS = 'grass'
-        WATER = 'water'
+        PLAINS = 'plains'
+        MOUNTAINS = 'mountains'
+        COAST = 'coast'
+        OCEAN = 'water'
 
-    def __init__(self, land_type):
+    def __init__(self, land_type, movement_penalty=1):
         self.land_type = land_type
         self.troop = None
-        self.city = False
+        self.city = None
+        self.movement_penalty = 1
+
+
+class Plains(Tile):
+    def __init__(self):
+        super().__init__(Tile.LandType.PLAINS, 1)
+
+
+class Mountains(Tile):
+    def __init__(self):
+        super().__init__(Tile.LandType.MOUNTAINS, 2)
 
 
 class City:
