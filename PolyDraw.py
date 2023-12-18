@@ -8,7 +8,8 @@ from PolyEntities import Map, Tile, Unit
 class Drawer:
     REFERENCE_IMAGES = {
         Tile.LandType.PLAINS: pygame.image.load("Art/Terrain/Tiles/ground_1.png"),
-        Tile.LandType.OCEAN: pygame.image.load("Art/Terrain/Tiles/ground_10.png"),
+        Tile.LandType.OCEAN: pygame.image.load("Art/Terrain/Tiles/ground_11.png"),
+        Tile.LandType.MOUNTAINS: pygame.image.load("Art/Terrain/Mountains/mountain_5.png"),
 
         Unit.UnitType.SCOUT: pygame.transform.scale_by(
             pygame.image.load('Art/Units/Imperius/Default/Imperius_Default_Scout.png'), 3),
