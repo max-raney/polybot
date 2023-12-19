@@ -20,8 +20,9 @@ class Map:
                     self.tiles[x][y] = Tile(Tile.LandType.MOUNTAINS)
                 else:
                     self.tiles[x][y] = Tile(Tile.LandType.OCEAN)
+
     def add_unit(self, unit, x, y):
-        self.tiles[x][y].troop = unit
+        self.tiles[x][y].unit = unit
         self.units.append(unit)
 
 
@@ -34,7 +35,7 @@ class Tile:
 
     def __init__(self, land_type, movement_penalty=1):
         self.land_type = land_type
-        self.troop = None
+        self.unit = None
         self.city = None
         self.movement_penalty = 1
 

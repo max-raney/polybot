@@ -3,6 +3,7 @@ import numpy as np
 import pygame
 from PolyEntities import Map, Warrior
 from PolyDraw import Drawer
+from PolyLogic import GameController
 
 
 def main():
@@ -16,14 +17,15 @@ def main():
     # Create a map
     game_map = Map(40)
 
-    # Create a Drawer instance
+    # Create instances
     drawer = Drawer(game_map)
+    game_controller = GameController(game_map)
 
     # Initialize two warriors
     warrior_1 = Warrior(0, 0, game_map)
     warrior_2 = Warrior(4, 5, game_map)
 
-    # Initial variables for click-and-drag
+    # Initial variables
     dragging = False
     start_x, start_y = 0, 0
     scroll_speed = 1
@@ -39,7 +41,7 @@ def main():
                 if event.button == 1:  # Left mouse button
                     dragging = True
                     start_x, start_y = event.pos
-                    drawer.tile_clicked(event.pos)
+                    game_controller.click_tile(drawer.tile_clicked(event.pos))
             if event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     dragging = False

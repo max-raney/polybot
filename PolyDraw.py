@@ -19,7 +19,6 @@ class Drawer:
             pygame.image.load(os.path.join(BASE_PATH, 'Art', 'Units', 'Imperius', 'Default', 'Imperius_Default_Scout.png')), 3),
         Unit.UnitType.WARRIOR: pygame.transform.scale_by(
             pygame.image.load(os.path.join(BASE_PATH, 'Art', 'Units', 'Imperius', 'Default', 'Imperius_Default_Warrior.png')), 3),
-        # Assuming MOVEMENT_RETICLE is in the same directory as your Python script
         MOVEMENT_RETICLE: pygame.image.load(os.path.join(BASE_PATH, "Art", "Misc", "moveTarget.png")),
     }
 
@@ -61,8 +60,8 @@ class Drawer:
         # subtract offset, tile value to center, and reverse transformation is the coordinate
         tile_coordinate = np.round(inverse_translation_matrix @ (pixel_vector - offset_vector)).astype(int)
 
-        print(f"Player selected tile {tile_coordinate}")
-        return tile_coordinate
+        # print(f"Player selected tile {tile_coordinate}")
+        return tile_coordinate.flatten()
 
     # draws image centered on coordinate
     def _draw_image(self, image, coordinates, surface=None):
